@@ -1,33 +1,62 @@
 'use strict';
 
-var GOLD = 1337;
-
 // Call this function when the page loads (the "ready" event)
-$(document).ready(function() {
-  initializePage();
-})
+$(document).on('ready', function() {
 
-/*
- * Function that is called when the document is ready.
- */
-function initializePage() {
+  var user = {};
 
-  // TODO: Remove the Oz
+  /*
+   * Get user data from the server.
+   */
+  function refreshUserData() {
+    $.post('/userdata', function(data) {
+      user = data;
+      // Update the gold badge
+      $('span.badge.gold-badge').text(user.gold + ' gold');
+    });
+  };
+
   console.log("Javascript connected!");
-  $(".store-item").click(function(){
-  	var item = $(this).parent().find('h1.text-center').text();
+
+  $('#failPurchase').hide();
+  $('#successPurchase').hide();
+
+  function buyItem(item, price) {
+    $.post('/buy', {
+      item:   item,
+      price:  price,
+      userid: user.userid
+    });
+  };
+
+  // Set up buy button handler
+  
+  $(".buy-button").click(function(){
+
+  	var item = $(this).parent().find('input.name-hack').val();
   	var price = Number.parseInt( $(this).parent().find('input.price-hack').val() );
-  	// console.log('item: ' + item);
-  	// console.log('price: ' + price)
-  	var yes = confirm("Buy this item for " + price + " gold?");
-  	if ( yes == true ) {
-  		if ( GOLD - price < 0 ) {
-  			alert("Sorry, you don't have enough gold yet.");
-  		}
-  		else {
-  			alert("Purchased 1 x " + item + '!' );
-  			GOLD -= price;
-  		}
-  	}
+
+    $('div.alert').hide();
+		if ( user.gold - price < 0 ) {
+      $('#failPurchase').show();
+      $('#failPurchase').children('span').text(item);
+      setTimeout(function(){
+        $('#failPurchase').fadeOut(1000);
+      },3000);
+		}
+		else {
+      $('#successPurchase').show();
+      $('#successPurchase').children('span').text(item);
+      setTimeout(function(){
+        $('#successPurchase').fadeOut(1000);
+      },3000);
+      buyItem(item,price);
+			user.gold -= price;
+		}
+    refreshUserData();
+
   });
-}
+  
+  refreshUserData();
+
+});

@@ -1,4 +1,5 @@
 var user = require('../common/user-common');
+var houses = require('../common/house-common');
 
 exports.viewProject = function(req, res){
   if ( user.isGuest( req ) ) {
@@ -20,6 +21,7 @@ exports.viewProject = function(req, res){
       	'price' : 1500,
         'id' : 'weekoff'
       }
-    ]
+    ],
+    'user': houses.getUser(req)
   });
 };

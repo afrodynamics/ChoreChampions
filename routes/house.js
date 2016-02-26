@@ -46,6 +46,26 @@ exports.reroll = function(req, res) {
 	}
 }
 
+exports.buy = function(req, res) {
+	var desiredItem = req.body.item;
+	var price       = req.body.price; // LOL this is terrrrrrrible
+	var userid      = req.body.userid;
+	var user = houses.getUser( req );
+	if ( userid == user.userid ) {
+		if ( desiredItem == "Re-Roll" ) {
+			user.rerolls++;
+			user.gold -= price;
+		}
+		else if ( desiredItem == "Week Off" ) {
+			user.weekoff = true;
+			user.gold -= price;
+		}
+		else {
+			console.log('Unknown: user attempted to buy item (' + item + ')');
+		}
+	}
+}
+
 exports.getUserData = function(req, res) {
 	var house = houses.getHouseFromReq(req);
 	if ( house !== null ) {

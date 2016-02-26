@@ -58,6 +58,7 @@ app.get('/store', store.viewProject);
 // Handle POSTS
 app.post('/settings', settings.update); // TODO: Temporary hack around the store
 app.post('/userdata', house.getUserData);
+app.post('/buy', house.buy);
 
 // POSTs for verifying chores
 app.post('/chores/submit', verifychores.submitForVerification);
