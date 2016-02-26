@@ -39,7 +39,7 @@
           {{#unless withinRerollPeriod }}
           <form action="/reroll" method="POST">
             <input type="hidden" name="id" value="{{id}}" />
-            <button class="btn btn-success btn-lg center-block reroll-chore-btn" data-reroll="{{id}}">Re-Roll <span class="badge">??? left</span></button>
+            <button class="btn btn-danger btn-lg center-block reroll-chore-btn" data-reroll="{{id}}">Re-Roll <span class="badge">??? left</span></button>
           </form>
           {{/unless}}
         </p>
