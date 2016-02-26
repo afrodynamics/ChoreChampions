@@ -5,6 +5,7 @@
 			"name": "Awesome House #1",
 			"last_deal": null,
 			"next_deal": null,
+			"reroll_deadline": null,
 			"users": [
 				{
 					"name": "Annie",
@@ -32,10 +33,19 @@
 			"settings": {
 				"free_rerolls_per_week": 1,
 				"deal_day": "Sunday",
-				"deal_time": "8 am"
+				"deal_time": "8 am",
+				"reroll_window": "4 hr"
 			},
 			"cards": [
 
+			],
+			"rerolled_cards": [
+				{
+					"rerolledBy": 0,
+					"card": {
+						
+					}
+				}
 			]
 		}
 	]

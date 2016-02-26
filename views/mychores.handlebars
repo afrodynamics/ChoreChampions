@@ -11,11 +11,17 @@
 	<div class="container-fluid">
     <div class="jumbotron">
       <h1>My Chores</h1>
-      {{#if chores }}
-      <p>Hi, {{ username }}. You have {{ chores.length }} unfinished chores this week. Get to it!</p>
+      {{#unless weekoff }}
+        {{#if chores }}
+        <p>Hi, {{ username }}. You have {{ chores.length }} unfinished chores this week. Get to it!</p>
+        {{else}}
+        <p>Hi, {{ username }}. Looks like you've finished all your chores this week!</p>
+        {{/if}}
       {{else}}
-      <p>Hi, {{ username }}. Looks like you've finished all your chores this week!</p>
-      {{/if}}
+        <p>
+          No responsibilites for you this week, {{ username }}! Go to the beach or something. :D
+        </p>
+      {{/unless}}
     </div>
 
     {{#unless chores}}

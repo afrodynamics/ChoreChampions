@@ -10,7 +10,8 @@ var user   = require('../common/user-common');
 exports.create = function(req, res) {
 	if ( user.isGuest( req ) ) {
 		houses.create(req);
-		res = houses.addUserToHouse(req, res);
+		houses.addUserToHouse(req, res);
+		return res;
 	}
 	return res.redirect('/mychores');
 };
@@ -38,9 +39,19 @@ exports.deal = function(req, res) {
 exports.reroll = function(req, res) {
 	if ( user.isLoggedIn(req) ) {
 		houses.reroll(req);
-		res.redirect('/mychores');
+		return res.redirect('/mychores');
 	}
 	else {
-		res.redirect('/');
+		return res.redirect('/');
+	}
+}
+
+exports.getUserData = function(req, res) {
+	var house = houses.getHouseFromReq(req);
+	if ( house !== null ) {
+		return res.json(houses.getUser(req));
+	}
+	else {
+		return res.json({});
 	}
 }

@@ -43,6 +43,21 @@
         </select>
       </div>
       <div class="form-group">
+        <label>Re-Roll Window</label>
+        <p>
+          After a new hand is dealt, you will have a short window of time to re-roll
+          certain undesirable chores.
+        </p>
+        <select class="form-control" name="reroll_window" _default="{{reroll_window}}" id="">
+          <option value="1 min">1 minute</option>
+          <option value="5 min">5 minutes</option>
+          <option value="15 min">15 minutes</option>
+          <option value="30 min">30 minutes</option>
+          <option value="60 min">1 hour</option>
+          <option value="120 min">2 hours</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label for="">House Code</label>
         <input type="text" class="form-control" name="code" value="{{ code }}" readonly/>
       </div>

@@ -42,6 +42,7 @@ if ('development' == app.get('env')) {
 
 // Add routes here
 app.get('/', landing.view);
+app.post('/', landing.view);
 app.get('/A', landing.viewA);
 app.get('/join', function(req,res) {
 	return res.redirect('/');
@@ -56,6 +57,7 @@ app.get('/store', store.viewProject);
 
 // Handle POSTS
 app.post('/settings', settings.update); // TODO: Temporary hack around the store
+app.post('/userdata', house.getUserData);
 
 // POSTs for verifying chores
 app.post('/chores/submit', verifychores.submitForVerification);

@@ -19,6 +19,7 @@ exports.view = function(req, res) {
     'code': myHouse.code,
     'deal_day': myHouse.settings.deal_day,
     'deal_time': myHouse.settings.deal_time,
+    'reroll_window': myHouse.settings.reroll_window,
     'users': users
   });
 };
@@ -38,6 +39,7 @@ exports.update = function(req, res) {
   myHouse.name = req.body.name;
   myHouse.settings.deal_day = req.body.deal_day;
   myHouse.settings.deal_time = req.body.deal_time;
+  myHouse.settings.reroll_window = req.body.reroll_window;
   house.updateNextDealDate( myHouse );
 
   res.render('settings', {
@@ -47,6 +49,7 @@ exports.update = function(req, res) {
     'code': myHouse.code,
     'deal_day': myHouse.settings.deal_day,
     'deal_time': myHouse.settings.deal_time,
+    'reroll_window': myHouse.settings.reroll_window,
     'users': users,
     'alert': 'Settings saved!'
   })

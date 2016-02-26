@@ -18,9 +18,15 @@
  *                to the dealer on the next deal cycle.
  */
 
-var DEFAULT_GOLD = 0;
+var DEFAULT_GOLD = 250;
 var DEFAULT_REROLLS = 1;
 var BOUNTY_INC = 10;
+var DEFAULT_SETTINGS = {
+	'free_rerolls_per_week': 1,
+	'deal_day': 'Sunday',
+	'deal_time': '8 am',
+	'reroll_window': '15 min'
+};
 
 var houseDB = require('../data/houses.json');
 var cardData = require('../data/cards.json');
@@ -63,12 +69,9 @@ function create( req ) {
 			users: [],
 			bathrooms: beds,
 			bedrooms: baths,
-			settings: {
-				'free_rerolls_per_week': 1,
-				'deal_day': 'Sunday',
-				'deal_time': '8am'
-			},
-			cards: cardData
+			settings: DEFAULT_SETTINGS,
+			cards: cardData,
+			rerolled_cards: []
 		};
 		updateNextDealDate(newHouse);
 		houseDB.houses.push(newHouse);
@@ -79,14 +82,59 @@ function create( req ) {
 	}
 }
 
-// TODO: Re-rolling!
 function reroll(req) {
 	var house = getHouseFromReq(req);
-	if ( house !== null ) {
-		// Update the time at which
+	var user  = getUser(req);
+	var cardId = req.body.id || '';
+	if ( house !== null && user !== null ) {
+		// Add the card to the rerolled_cards list in the house,
+		// and keep track of who rerolled it.
+		if ( user.rerolls > 0 ) {
+			var card = getCard(req, cardId);
+			card.belongsTo = ''; // Reset the owner of the card
+			var rerollObj = {
+				rerolledBy:  user.userid,
+				card: card
+			};
+			user.rerolls--;
+		}
 	}
 }
 module.exports.reroll = reroll;
+
+/**
+ * After the end of the reroll period, all of the cards that
+ * were rerolled are randomly distributed among the people
+ * who rerolled.
+ * @param  {House} house house object
+ * @return {[type]}     [description]
+ */
+function dealFromRerolledCards(house) {
+	if ( house !== null ) {
+		
+		// Keeps track of the total number of rerolls, by ID
+		var rerollsPerUser = [];
+		for ( var u = 0; u < house.rerolled_cards.length; ++u ) {
+			var rerolledBy = house.rerolled_cards[u].rerolledBy;
+			rerollsPerUser.push( rerolledBy );
+		}
+		shuffle(house.rerolled_cards);
+		var cardIndex = 0;
+		for ( var u = 0; 
+			  cardIndex < house.rerolled_cards.length && u < usersWhoRerolled.length; 
+			  ++u ) {
+			var userid = rerollsPerUser[u];
+			var card = getCard(req, house.rerolled_cards[cardIndex].id );
+			card.belongsTo = userid;
+			card.belongsToName = getUser(null, userid).name;
+			cardIndex++;
+		}
+
+		// Clear the rerolled list
+		house.rerolled_cards = [];
+	}
+}
+module.exports.dealFromRerolledCards = dealFromRerolledCards;
 
 /**
  * The dealer takes all the cards out from the verified
@@ -104,36 +152,53 @@ function deal(req) {
 			var userIndex = 0;
 			var cardList = house.cards.cards;
 			var freeRolls = house.settings.free_rerolls_per_week;
+			var allUsersHaveWeekoff = true;
+
 			// Give users their free re-rolls per week.
 			for ( var u = 0; u < house.users.length; ++u ) {
 				house.users[u].rerolls += freeRolls;
+				allUsersHaveWeekoff = house.users[u].weekoff && allUsersHaveWeekoff
 			}
-			for ( var cardIndex = 0; cardIndex < cardList.length; ++cardIndex ) {
-				
-				var user = house.users[userIndex];
 
-				// If the current card wasn't verified last week,
-				// we should increase its bounty. Otherwise, it 
-				// should be reset
-				var card = cardList[cardIndex];
+			if ( allUsersHaveWeekoff === false ) {
+				for ( var cardIndex = 0; cardIndex < cardList.length; ++cardIndex ) {
+					
+					var user = house.users[userIndex];
+					while ( user.weekoff === true ) {
+						// If the user has the week off of chores, then skip giving them a card
+						userIndex = (userIndex + 1) % house.users.length;
+						user = house.users[userIndex];
+					}
 
-				if ( card.status == 'verified' ) {
-					card.bounty = 0;
+					// If the current card wasn't verified last week,
+					// we should increase its bounty. Otherwise, it 
+					// should be reset
+					var card = cardList[cardIndex];
+
+					if ( card.status == 'verified' ) {
+						card.bounty = 0;
+					}
+					else {
+						card.bount += BOUNTY_INC;
+					}
+
+					card.status = 'dealt';
+					card.belongsTo = user.userid;
+					card.belongsToName = user.name;
+
+					// Increment user index and wrap around if it's too big
+					userIndex = (userIndex + 1) % house.users.length;
 				}
-				else {
-					card.bount += BOUNTY_INC;
-				}
-
-				card.status = 'dealt';
-				card.belongsTo = user.userid;
-				card.belongsToName = user.name;
-
-				// Increment user index and wrap around if it's too big
-				userIndex = (userIndex + 1) % house.users.length;
 			}
+
 			// Calculate the time for the next deal
 			var now = Date.now();
 			house.last_deal = new Date(now);
+
+			// Reset the weekoff boolean flag.
+			for ( var u = 0; u < house.users.length; ++u ) {
+				house.users[u].weekoff = false;
+			}
 
 			// Round off the time, update the next
 			updateNextDealDate(house);
@@ -218,10 +283,11 @@ module.exports.getAllCompleted = getAllCompleted;
  * @param {[type]} res HTTP response
  */
 function addUserToHouse(req, res) {
+	
 	// Adds the requested user to the house, and logs him/her in
 	// via cookie. If the house does not exist, then we are redirected
 	// back to the
-	var code   = req.query.code || req.body.code || '';
+	var code  = req.query.code || req.body.code  || '';
 	var name = req.query.name  || req.body.name  || '';
 	var userid = -1;
 
@@ -232,11 +298,15 @@ function addUserToHouse(req, res) {
 			name: name,
 			userid: userid,
 			gold: DEFAULT_GOLD,
-			rerolls: DEFAULT_REROLLS
+			rerolls: DEFAULT_REROLLS,
+			weekoff: false,
+			chores_completed: 0,
+			chores_approved: 0,
+			chores_rejected: 0
 		});
 	}
 	catch (e) {
-		console.log("ERROR! HOUSE CODE DOESN'T EXIST!");
+		// console.log("ERROR! HOUSE CODE DOESN'T EXIST!");
 		return res.render('landing', {
 			'error': "A house with the given code does not exist.",
 			'randomHouseCode': getNewHouseCode()
@@ -246,6 +316,19 @@ function addUserToHouse(req, res) {
 	res.cookie('code', code );
 	res.cookie('name', name );
 	res.cookie('userid', userid);
+
+	// Whenever a user joins the house, we should re-deal all of the chores
+	// but preserve those who had a week off.
+	var users = getHouse(code).users;
+	var weekoffs = [];
+	
+	for ( var i = 0; i < users.length; ++i ) {
+		weekoffs.push(users[i].weekoff)
+	}
+	deal(req);
+	for ( var i = 0; i < users.length; ++i ) {
+		users[i].weekoff = weekoffs[i];
+	}
 
 	return res.redirect('/mychores');
 }
@@ -487,6 +570,11 @@ function updateNextDealDate(houseObj) {
 
 	// Remember, .getTime() returns in milliseconds
 	houseObj.next_deal = new Date( lastDeal.getTime() + (dayOffset * 24 + hourOffset) * 60 * 60 * 1000 );
+
+	// Schedule the reroll deal
+	setTimeout(function executeRerollRedeal(){
+		dealFromRerolledCards(houseObj);
+	}, houseObj.settings.reroll_window * 60 * 1000 );
 }
 module.exports.updateNextDealDate = updateNextDealDate;
 
@@ -498,6 +586,20 @@ module.exports.updateNextDealDate = updateNextDealDate;
  */
 function withinRerollPeriod( req ) {
 	var now = Date.now();
-	return true; // TODO: Actually test this later
+	var house = getHouseFromReq( req );
+	if ( house !== null ) {
+		var lastDealTime = house.last_deal.getTime();
+		var rerollWindow = parseInt(house.settings.reroll_window.split(' ')[0]);
+
+		// the reroll_window property is stored in minutes, not hours!
+		var latestRerollTime = lastDealTime + (rerollWindow * 60 * 1000);
+		if ( now <= latestRerollTime && now >= lastDealTime ) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	return false;
 }
 module.exports.withinRerollPeriod = withinRerollPeriod;

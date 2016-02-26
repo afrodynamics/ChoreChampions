@@ -15,7 +15,8 @@ exports.viewProject = function(req, res){
   		'title': 'My Chores',
   		'navbar': user.getNavbarData( req ),
   		'username': user.getName( req ),
-  		'chores': hand
+  		'chores': hand,
+      'weekoff': house.getUser(req).weekoff
   	});
   }
 };

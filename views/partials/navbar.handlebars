@@ -7,7 +7,10 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/mychores">Chore Champions{{!-- {{ title }} --}}</a>
+      <a class="navbar-brand" href="/mychores">Chore Champions</a>
+      <p class="navbar-text pull-right">
+        <span class="badge gold-badge">{{ navbar.gold }} gold</span>
+      </p>
     </div>
     <div class="collapse navbar-collapse" id="nav-hamburger-menu">
       <ul class="nav navbar-nav">
@@ -20,7 +23,7 @@
       </ul>
       <p class="navbar-text text-center">
         {{!-- Shamelessly using bootsrap's button coloring CSS here --}}
-        <span class="badge btn-warning">{{ navbar.gold }} gold</span>
+        {{!-- <span class="badge btn-warning">{{ navbar.gold }} gold</span> --}}
         <span class="badge btn-success">Next Deal: {{ navbar.nextDeal }}</span>
       </p>
   </div>

@@ -3,6 +3,11 @@ body {
 	padding-top: 70px;
 }
 
+.gold-badge {
+	color: #222;
+	background-color: #dddd22;
+}
+
 /* For keeping buttons at the bottom of a form 
    right-aligned and padded properly. */
 .btn-right-padded {
