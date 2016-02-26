@@ -145,7 +145,9 @@ module.exports.dealFromRerolledCards = dealFromRerolledCards;
  */
 function deal(req) {
 	var house = getHouseFromReq(req);
+	console.log(house);
 	if ( house !== null ) {
+		console.log('Cards are being dealt!')
 		if ( house.users.length > 0 ) {
 			// Fisher-Yates shuffle, thanks to internet
 			shuffle(house.cards.cards);
@@ -291,6 +293,8 @@ function addUserToHouse(req, res) {
 	var name = req.query.name  || req.body.name  || '';
 	var userid = -1;
 
+	console.log('Adding a new user to house: ' + code);
+
 	try {
 		var houseData = getHouse(code);
 		userid = houseData.users.length;
@@ -306,7 +310,6 @@ function addUserToHouse(req, res) {
 		});
 	}
 	catch (e) {
-		// console.log("ERROR! HOUSE CODE DOESN'T EXIST!");
 		return res.render('landing', {
 			'error': "A house with the given code does not exist.",
 			'randomHouseCode': getNewHouseCode()
@@ -325,6 +328,7 @@ function addUserToHouse(req, res) {
 	for ( var i = 0; i < users.length; ++i ) {
 		weekoffs.push(users[i].weekoff)
 	}
+	req.cookies.code = code; // hack: allows deal function to detect the proper house
 	deal(req);
 	for ( var i = 0; i < users.length; ++i ) {
 		users[i].weekoff = weekoffs[i];
