@@ -32,5 +32,13 @@
 			$('#buttonContainer').collapse('show');
 		});
 
+		$("#info-btn").click(function(e){
+			ga("send", "event", "info", "click");
+		});
+
+		$("#next-btn").click(function(e){
+			ga("send", "event", "next", "click");
+		});
+
 	})
 })();
