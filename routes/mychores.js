@@ -6,6 +6,10 @@ exports.viewProject = function(req, res){
   	return res.redirect('/');
   }
   else {
+
+    $("#myCarousel").carousel({
+  swipe: 30 // percent-per-second, default is 50. Pass false to disable swipe
+});
   	// This is an awful hack to get around the fact that
   	// handlebars partials won't find a simple boolean...
   	var hand = user.getHand(req);
@@ -19,4 +23,5 @@ exports.viewProject = function(req, res){
       'weekoff': house.getUser(req).weekoff
   	});
   }
-};
+};  
+
