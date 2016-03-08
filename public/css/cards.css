@@ -28,6 +28,14 @@ body {
 .complete-chore-btn {}
 .reroll-chore-btn {}
 
+/* Overwrite bootstrap CSS */
+.carousel-control.left {
+	background-image: none;
+}
+.carousel-control.right {
+	background-image: none;
+}
+
 /*
  * For explanation on what's going on, check this out:
  * https://desandro.github.io/3dtransforms/docs/card-flip.html
