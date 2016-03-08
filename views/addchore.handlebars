@@ -1,0 +1,66 @@
+<!doctype html>
+
+<html>
+<head>
+  <title>Chore Champs - Add Chore</title>
+  {{> styles }}
+</head>
+
+<body>
+  {{> navbar }}
+  <div class="container" margin="auto">
+    {{#if alert}}
+        <div class="alert alert-success">
+          {{ alert }}
+        </div>
+    {{/if}}
+    <div class="row">
+      <div class="col-xs-12">
+        <h1>Add Chore</h1>      
+      </div>
+    </div>
+
+    <form action="/addchore" method="post">
+      <div class="form-group">
+        <label>Chore Name</label> 
+        <input type="text" class="form-control" name="name" maxlength="13" placeholder="Custom Chore" required/>
+      </div>
+      <div class="form-group">
+        <label>Chore Reward</label>
+        <select name="reward" class="form-control">
+          <option value="15">15 gold (common)</option>
+          <option value="50">50 gold (rare)</option>
+          <option value="100">100 gold (ultra-rare)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Verification Bonus</label>
+        <p>The amount of gold your roomates receive for making sure this chore was completed correctly.</p>
+        <select name="reward" class="form-control">
+          <option value="5">5 gold</option>
+          <option value="10">10 gold</option>
+          <option value="25">25 gold</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Image URL</label>
+        <input type="text" class="form-control" name="imageURL" placeholder="imgur etc." required/>
+      </div>
+      <div class="form-group">
+        <label>Requirements (Optional)</label> 
+        <input type="text" class="form-control" name="req1" maxlength="65" placeholder="Requirement 1" /><br>
+        <input type="text" class="form-control" name="req2" maxlength="65" placeholder="Requirement 2" /><br>
+        <input type="text" class="form-control" name="req3" maxlength="65" placeholder="Requirement 3" />
+      </div>
+      <div class="form-group">
+        <button class="btn btn-success form-control saveChanges">Create Card</button>        
+      </div>
+    </form>
+  </div>
+  {{> footer }}
+  </div>
+
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

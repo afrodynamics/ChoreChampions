@@ -17,6 +17,7 @@ var verifychores = require('./routes/verifychores');
 var allchores = require('./routes/allchores');
 var settings = require('./routes/settings');
 var store = require('./routes/store');
+var chores = require('./routes/chores');
 
 var app = express();
 
@@ -46,7 +47,7 @@ app.post('/', landing.view);
 app.get('/A', landing.viewA);
 app.get('/join', function(req,res) {
 	return res.redirect('/');
-})
+});
 
 app.get('/home', homeScreen.view);
 app.get('/mychores', mychores.viewProject);
@@ -59,6 +60,10 @@ app.get('/store', store.viewProject);
 app.post('/settings', settings.update); // TODO: Temporary hack around the store
 app.post('/userdata', house.getUserData);
 app.post('/buy', house.buy);
+
+// Creating chores
+app.get('/addchore', chores.view);
+app.post('/addchore', chores.update);
 
 // POSTs for verifying chores
 app.post('/chores/submit', verifychores.submitForVerification);

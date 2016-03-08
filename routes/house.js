@@ -34,7 +34,7 @@ exports.deal = function(req, res) {
 	else {
 		return res.redirect('/');
 	}
-}
+};
 
 exports.reroll = function(req, res) {
 	if ( user.isLoggedIn(req) ) {
@@ -44,7 +44,7 @@ exports.reroll = function(req, res) {
 	else {
 		return res.redirect('/');
 	}
-}
+};
 
 exports.buy = function(req, res) {
 	var desiredItem = req.body.item;
@@ -64,7 +64,7 @@ exports.buy = function(req, res) {
 			console.log('Unknown: user attempted to buy item (' + item + ')');
 		}
 	}
-}
+};
 
 exports.getUserData = function(req, res) {
 	var house = houses.getHouseFromReq(req);
@@ -74,4 +74,4 @@ exports.getUserData = function(req, res) {
 	else {
 		return res.json({});
 	}
-}
+};

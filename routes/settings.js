@@ -9,7 +9,7 @@ exports.view = function(req, res) {
   var users = [];
   for (var i = 0; i < myHouse.users.length; ++i) {
     if ( i != req.cookies.userid ) {
-      users.push( myHouse.users[i] )
+      users.push( myHouse.users[i] );
     }
   }
   res.render('settings', {
@@ -32,7 +32,7 @@ exports.update = function(req, res) {
   var users = [];
   for (var i = 0; i < myHouse.users.length; ++i) {
     if ( i != req.cookies.userid ) {
-      users.push( myHouse.users[i] )
+      users.push( myHouse.users[i] );
     }
   }
 
@@ -52,5 +52,5 @@ exports.update = function(req, res) {
     'reroll_window': myHouse.settings.reroll_window,
     'users': users,
     'alert': 'Settings saved!'
-  })
+  });
 };

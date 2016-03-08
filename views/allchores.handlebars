@@ -16,6 +16,10 @@
       </p>
     </div>
 
+    {{#if alert}}
+    <div class="alert alert-success">{{ alert }}</div>
+    {{/if}}
+
     <div id="myCarousel" class="carousel slide">
       <!-- remove comments if we want the carousel dots on the bottom -->
       <!--<ol class="carousel-indicators">

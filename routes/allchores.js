@@ -7,7 +7,7 @@ exports.viewProject = function(req, res) {
   }
   res.render('allchores', {
   	title: 'All Chores',
-  	withinRerollPeriod: false,
+  	withinRerollPeriod: house.withinRerollPeriod(req),
   	navbar: user.getNavbarData(req),
   	'cards': house.getAllCards( req )
   });

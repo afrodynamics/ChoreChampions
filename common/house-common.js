@@ -27,6 +27,7 @@ var DEFAULT_SETTINGS = {
 	'deal_time': '8 am',
 	'reroll_window': '15 min'
 };
+var MAX_CARD_NAME_LENGTH = 13;
 
 var houseDB = require('../data/houses.json');
 var cardData = require('../data/cards.json');
@@ -81,6 +82,44 @@ function create( req ) {
 		throw "This house already exists!";
 	}
 }
+
+function createCard( req ) {
+	var house = getHouseFromReq(req);
+	if ( house !== null ) {
+		var card = {};
+
+		card.id = house.cards.length;
+		card.name = req.body.name;
+
+		if ( card.name.length > MAX_CARD_NAME_LENGTH ) {
+			card.name = card.name.slice(0,MAX_CARD_NAME_LENGTH);
+		}
+
+		card.reward = parseInt(req.body.reward);
+		card.imageURL = req.body.imageURL || '/img/default.png';
+		card.bounty = 0;  // Total accumulated bounty on card if it hasn't been completed in a while
+		card.verifyBonus = 5;
+		card.requirements = [];
+
+		if ( req.body.req1 !== '' ) {
+			card.requirements.push(req.body.req1);
+		}
+		if ( req.body.req2 !== '' ) {
+			card.requirements.push(req.body.req2);
+		}
+		if ( req.body.req3 !== '' ) {
+			card.requirements.push(req.body.req3);
+		}
+
+		card.belongsTo = ""; // Dealer
+		card.belongsToName = "";
+		card.state = "undealt";
+
+		// Add new card to card list
+		house.cards.cards.push(card);
+	}
+}
+module.exports.createCard = createCard;
 
 function reroll(req) {
 	var house = getHouseFromReq(req);
@@ -147,7 +186,7 @@ function deal(req) {
 	var house = getHouseFromReq(req);
 	console.log(house);
 	if ( house !== null ) {
-		console.log('Cards are being dealt!')
+		console.log('Cards are being dealt!');
 		if ( house.users.length > 0 ) {
 			// Fisher-Yates shuffle, thanks to internet
 			shuffle(house.cards.cards);
@@ -326,7 +365,7 @@ function addUserToHouse(req, res) {
 	var weekoffs = [];
 	
 	for ( var i = 0; i < users.length; ++i ) {
-		weekoffs.push(users[i].weekoff)
+		weekoffs.push(users[i].weekoff);
 	}
 	req.cookies.code = code; // hack: allows deal function to detect the proper house
 	deal(req);
